@@ -1,9 +1,8 @@
 package ru.netology.web.test;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.*;
 import ru.netology.web.data.DataGenerator;
 import ru.netology.web.page.OrderPage;
 import java.text.SimpleDateFormat;
@@ -18,6 +17,16 @@ public class TourOrderTest {
     SimpleDateFormat yearFormatter = new SimpleDateFormat("yy");
     SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
 
+
+    @BeforeAll
+    static void setupAll() {
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        SelenideLogger.removeListener("allure");
+    }
     @BeforeEach
     public void setup() {
         order = open("http://localhost:8080", OrderPage.class);
@@ -42,11 +51,28 @@ public class TourOrderTest {
     }
 
     @Test
-    @DisplayName("1.1b.Positive test for DECLINED card")
-    public void positiveTestForDeclinedCard() {
+    @DisplayName("1.1b.Negative test for DECLINED card")
+    public void negativeTestForDeclinedCard() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
                 declinedCardNum,
+                monthFormatter.format(testDate),
+                yearFormatter.format(testDate),
+                DataGenerator.generateRandomOwner(),
+                DataGenerator.generateRandomCVC());
+        order.checkCardNumberValidationMessage("Неверный формат", false);
+        order.checkMonthValidationMessage("Неверный формат", false);
+        order.checkYearValidationMessage("Неверный формат", false);
+        order.checkOwnerValidationMessage("Поле обязательно для заполнения", false);
+        order.checkCvcValidationMessage("Неверный формат", false);
+        order.findBankErrorMessage("Ошибка! Банк отказал в проведении операции.");
+    }
+    @Test
+    @DisplayName("1.1c.Negative test for not registered card")
+    public void negativeTestForNotRegisteredCard() {
+        Date testDate = DataGenerator.generateValidFutureDate();
+        order.makeOrder(
+                "8723 0945 4589 1290",
                 monthFormatter.format(testDate),
                 yearFormatter.format(testDate),
                 DataGenerator.generateRandomOwner(),

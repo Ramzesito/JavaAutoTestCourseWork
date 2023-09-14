@@ -1,11 +1,6 @@
 package ru.netology.web.data;
 
 import com.github.javafaker.Faker;
-import lombok.Value;
-
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Year;
 import java.util.*;
 
 public class DataGenerator {

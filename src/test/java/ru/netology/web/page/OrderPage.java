@@ -40,20 +40,6 @@ public class OrderPage {
         cardCvcField.setValue(cardCvc);
         contButton.click();
 
-        //SelenideElement par = cardNumberField.parent().parent();
-        //System.out.println(cardCvc);
-
-
-        //if (numberNotify.exists()) {System.out.println(numberNotify.text());}
-        //System.out.println(captions.findBy(Condition.text("Номер карты")).attr("class"));
-        //SelenideElement sss = captions.findBy(Condition.text("Номер карты"));
-        //SelenideElement sss = captions.get(0);
-        //sss.setValue("0000");
-        //System.out.println(par.find("input.input__control").attr("placeholder"));
-        //parent.shouldNotBe(visible);
-        //SelenideElement err = par.find("span.input__sub");
-        //err.shouldBe(visible);
-
     }
 
     public void findBankErrorMessage(String expectedText) {
