@@ -5,18 +5,14 @@ import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
 import ru.netology.web.data.DataGenerator;
 import ru.netology.web.page.OrderPage;
-import java.text.SimpleDateFormat;
+
+import java.sql.SQLException;
 import java.util.Date;
 import static com.codeborne.selenide.Selenide.*;
 
 public class TourOrderTest {
 
     OrderPage order;
-    String approovedCardNum = "1111 2222 3333 4444";
-    String declinedCardNum = "5555 6666 7777 8888";
-    SimpleDateFormat yearFormatter = new SimpleDateFormat("yy");
-    SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
-
 
     @BeforeAll
     static void setupAll() {
@@ -34,12 +30,12 @@ public class TourOrderTest {
 
     @Test
     @DisplayName("1.1a.Positive test for APPROOVED card")
-    public void positiveTestForApproovedCard() {
+    public void positiveTestForApproovedCard() throws SQLException {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkCardNumberValidationMessage("Неверный формат", false);
@@ -55,9 +51,9 @@ public class TourOrderTest {
     public void negativeTestForDeclinedCard() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                declinedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getDeclinedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkCardNumberValidationMessage("Неверный формат", false);
@@ -73,8 +69,8 @@ public class TourOrderTest {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
                 "8723 0945 4589 1290",
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkCardNumberValidationMessage("Неверный формат", false);
@@ -91,8 +87,8 @@ public class TourOrderTest {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
                 "",
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkCardNumberValidationMessage("Неверный формат", true);
@@ -103,8 +99,8 @@ public class TourOrderTest {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
                 "1111 2222 3333",
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkCardNumberValidationMessage("Неверный формат", true);
@@ -114,12 +110,12 @@ public class TourOrderTest {
     public void negativeTestForCardNumber_OverComplete() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum + "5",
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum() + "5",
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
-        Assertions.assertEquals(approovedCardNum, order.getCardNumber());
+        Assertions.assertEquals(DataGenerator.getApproovedCardNum(), order.getCardNumber());
         order.checkCardNumberValidationMessage("Неверный формат", false);
         order.findBankSuccessMessage("Операция одобрена Банком.");
     }
@@ -129,8 +125,8 @@ public class TourOrderTest {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
                 "qw_``,.neg_test!",
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         Assertions.assertEquals("", order.getCardNumber());
@@ -142,9 +138,9 @@ public class TourOrderTest {
     public void negativeTestForMonth_Empty() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
+                DataGenerator.getApproovedCardNum(),
                 "",
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkMonthValidationMessage("Неверный формат", true);
@@ -154,9 +150,9 @@ public class TourOrderTest {
     public void negativeTestForMonth_NotFullyComplete() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
+                DataGenerator.getApproovedCardNum(),
                 "1",
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkMonthValidationMessage("Неверный формат", true);
@@ -166,9 +162,9 @@ public class TourOrderTest {
     public void negativeTestForCardNumber_OverLimit() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
+                DataGenerator.getApproovedCardNum(),
                 "13",
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkMonthValidationMessage("Неверно указан срок действия карты", true);
@@ -178,9 +174,9 @@ public class TourOrderTest {
     public void negativeTestForMonth_NotDigits() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
+                DataGenerator.getApproovedCardNum(),
                 "q!",
-                yearFormatter.format(testDate),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         Assertions.assertEquals("", order.getMonth());
@@ -192,8 +188,8 @@ public class TourOrderTest {
     public void negativeTestForYear_Empty() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
                 "",
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
@@ -204,8 +200,8 @@ public class TourOrderTest {
     public void negativeTestForYear_NotFullyComplete() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
                 "1",
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
@@ -216,9 +212,9 @@ public class TourOrderTest {
     public void negativeTestForYear_OverLimit() {
         Date testDate = DataGenerator.generateInvalidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkYearValidationMessage("Неверно указан срок действия карты", true);
@@ -228,8 +224,8 @@ public class TourOrderTest {
     public void negativeTestForYear_NotDigits() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
                 "q!",
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
@@ -242,9 +238,9 @@ public class TourOrderTest {
     public void negativeTestForOwner_Empty() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 "",
                 DataGenerator.generateRandomCVC());
         order.checkOwnerValidationMessage("Поле обязательно для заполнения", true);
@@ -254,9 +250,9 @@ public class TourOrderTest {
     public void negativeTestForOwner_NotLetters() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 "123 _-=",
                 DataGenerator.generateRandomCVC());
         order.checkOwnerValidationMessage("Неверный формат", true);
@@ -266,9 +262,9 @@ public class TourOrderTest {
     public void negativeTestForOwner_OverLength() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateLongOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkOwnerValidationMessage("Слишком длинное имя", true);
@@ -278,9 +274,9 @@ public class TourOrderTest {
     public void negativeTestForOwner_IfCyrillic() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 "Старик Хоттабыч",
                 DataGenerator.generateRandomCVC());
         order.checkOwnerValidationMessage("Имя должно быть на латинице", true);
@@ -291,9 +287,9 @@ public class TourOrderTest {
     public void negativeTestForCvc_Empty() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 "");
         order.checkCvcValidationMessage("Неверный формат", true);
@@ -303,9 +299,9 @@ public class TourOrderTest {
     public void negativeTestForCvc_NotFullyComplete() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 "12");
         order.checkCvcValidationMessage("Неверный формат", true);
@@ -315,9 +311,9 @@ public class TourOrderTest {
     public void negativeTestForCvc_OverLimit() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 "1234");
         Assertions.assertEquals("123", order.getCvc());
@@ -329,9 +325,9 @@ public class TourOrderTest {
     public void negativeTestForCvc_NotDigits() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 "q%=");
         Assertions.assertEquals("", order.getCvc());
@@ -365,9 +361,9 @@ public class TourOrderTest {
                 "",
                 "");
         order.makeOrder(
-                approovedCardNum,
-                monthFormatter.format(testDate),
-                yearFormatter.format(testDate),
+                DataGenerator.getApproovedCardNum(),
+                DataGenerator.getDateFormatted(testDate, "MM"),
+                DataGenerator.getDateFormatted(testDate, "yy"),
                 DataGenerator.generateRandomOwner(),
                 DataGenerator.generateRandomCVC());
         order.checkCardNumberValidationMessage("Неверный формат", false);
