@@ -6,7 +6,6 @@ import org.junit.jupiter.api.*;
 import ru.netology.web.data.DataGenerator;
 import ru.netology.web.page.OrderPage;
 
-import java.sql.SQLException;
 import java.util.Date;
 import static com.codeborne.selenide.Selenide.*;
 
@@ -30,7 +29,7 @@ public class TourOrderTest {
 
     @Test
     @DisplayName("1.1a.Positive test for APPROOVED card")
-    public void positiveTestForApproovedCard() throws SQLException {
+    public void positiveTestForApproovedCard() {
         Date testDate = DataGenerator.generateValidFutureDate();
         order.makeOrder(
                 DataGenerator.getApproovedCardNum(),
